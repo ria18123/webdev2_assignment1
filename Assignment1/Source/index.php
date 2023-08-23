@@ -1,161 +1,199 @@
 <?php
+// Start a session at the beginning of the file
 session_start();
-require('dataconnection/configuration.php'); // Connecting to the database
+
+// Include the database connection code from configuration.php
+require('dataconnection/configuration.php');
+
+// Initialize variables to store user input
+$email = $password = '';
+
+// Check if the form has been submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Sanitize and store form inputs
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Retrieve user data from the database based on the email
+    $sql = "SELECT * FROM users WHERE Email = ?";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+
+    // Verify the password
+    if ($user && password_verify($password, $user['Password'])) {
+        // Store user data in the session
+        $_SESSION['user'] = $user;
+        
+        // Redirect to a dashboard or home page
+        header('Location: user_dashboard.php'); // Change this to your desired location
+        exit();
+    } else {
+        $loginError = "Invalid email or password.";
+    }
+}
+
+// Check if the user has chosen to continue as a guest
+if (isset($_GET['continue_as_guest'])) {
+    // Redirect to the index.php page
+    header('Location: user_dashboard.php');
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>ibuy Auctions</title>
-		<link rel="stylesheet" href="ibuy.css" />
-	</head>
+<head>
+    <!-- title of the page -->
+    <title>User Login</title>
     <style>
-        /* Basic styles for dropdown menu */
-        .dropdown {
-            position: relative;
-            display: inline-block;
+        /* Reset default margin and padding */
+        body, h1, h2, p, form {
+            margin: 0;
+            padding: 0;
         }
 
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
+        /* Set a background color */
+        body {
+            background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
         }
 
-        .dropdown:hover .dropdown-content {
+        /* Header styling */
+        header {
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        header h1{
+           font-weight: 600;
+           font-size: 40px;
+        }
+
+        /* Banner styling */
+        img {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Form container */
+        form {
+            max-width: 400px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form label and input styling */
+        label, input {
             display: block;
+            margin-bottom: 10px;
         }
-        header form input[type=submit] {
-	background-color: #005d96;
-	color: white;
-	width: 20%;
-	font-size: 2em;
-	padding: 0.5em;
-	cursor: pointer;
-	border: 0;
-}
-header form input[type="text"] {
-  border: 2px solid black;
-  font-size: 2em;
-  padding: 0.45em;
-  width: 70%;
-}
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        /* Button styling */
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #005d96;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #5aa0c2;
+        }
+
+        /* Link styling */
+        a {
+            color: #222;
+            text-decoration: none;
+        }
+
+        /* Centering the form and links */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Error message styling */
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .highlighted-link {
+            color: red; /* Change the color to your preferred highlight color */
+            font-weight: bold;
+        }
+
+        /* Center the h2 heading */
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px 0;
+            background-color: #333;
+            color: #fff;
+        }
     </style>
-	<body>
-		<header>
-			<h1><span class="i">i</span><span class="b">b</span><span class="u">u</span><span class="y">y</span></h1>
+</head>
+<body>
+<header>
+    <!-- Website logo -->
+    <h1><span class="i">i</span><span class="b">b</span><span class="u">u</span><span class="y">y</span></h1>
+</header>
 
-			<form action="#">
-				<input type="text" name="search" placeholder="Search for anything" />
-				<input type="submit" name="submit" value="Search" />
-			</form>
-		</header>
+<!-- Banner image -->
+<img src="banners/1.jpg" alt="Banner" />
 
-		<nav>
-        <ul>
-            <!-- Dropdown for categories -->
-            <li class="dropdown">
-                <a href="#" class="categoryLink">Categories</a>
-                <ul class="dropdown-content">
-                    <?php
-                    // Fetch categories from the database
-                    $categoriesQuery = "SELECT categoryName FROM categories";
-                    $categoriesResult = $pdo->query($categoriesQuery);
+<?php if (isset($loginError)) { ?>
+    <!-- Display an error message if the $loginError variable is set -->
+    <p class="error"><?php echo $loginError; ?></p>
+<?php } ?>
 
-                    // Loop through the categories and generate dropdown items
-                    while ($category = $categoriesResult->fetch(PDO::FETCH_ASSOC)) {
-                        echo '<li><a href="#">' . $category['categoryName'] . '</a></li>';
-                    }
-                    ?>
-                </ul>
-            </li>
-            <!-- Other navigation links -->
-            <li><a class="categoryLink" href="index.php">Home</a></li>
-            <li><a class="categoryLink" href="#">Latest listings</a></li>
-            <li><a class="categoryLink" href="#">Search Results</a></li>
-            <li><a class="categoryLink" href="/Admin/adminlogin.php">Admin</a></li>
-            <li><a class="categoryLink" href="category.php">Category listings</a></li>
-            <li><a class="categoryLink" href="Auction.php">Auction</a></li>
-            <li><a class="categoryLink" href="login.php">Login</a></li>
-        </ul>
-    </nav>
+<!-- User login form -->
+<form method="POST">
+    <h2>User Login</h2>
+    <!-- Email input -->
+    <label for="email">Email:</label>
+    <input type="email" name="email" required><br>
 
-    <img src="banners/1.jpg" alt="Banner" />
+    <!-- Password input -->
+    <label for="password">Password:</label>
+    <input type="password" name="password" required><br>
 
-    <main>
-        <h1>Latest Listings / Search Results / Category listing</h1>
+    <!-- Submit button to initiate the login process -->
+    <button type="submit">LOG IN</button>
+</form>
 
-        <ul class="productList">
+<!-- Link to the registration page for users who don't have an account -->
+<p class="text-center">Don't have an account? <a href="register.php" class="highlighted-link">Register</a></p>
 
-        <ul class="productList">
-        <?php
-        // Fetch the most recent 10 auctions
-        $sql = "SELECT * FROM auctions ORDER BY auctionDate DESC LIMIT 10";
-        $stmt = $pdo->query($sql);
+<!-- Link to continue as a guest -->
+<p class="text-center">Or, <a href="?continue_as_guest">Continue as Guest</a></p>
 
-        while ($auction = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            echo '<li>';
-            echo '<img src="product.png" alt="' . $auction['auction_name'] . '">';
-            echo '<article>';
-            echo '<h2>' . $auction['auction_name'] . '</h2>';
-            echo '<h3>' . getCategoryName($auction['categoryID'], $pdo) . '</h3>';
-            echo '<p>' . $auction['Description'] . '</p>';
-
-            // Use the getCurrentBidAmount function to display the current bid
-            $currentBid = getCurrentBidAmount($auction['auction_name'], $pdo);
-            echo '<p class="price">Current bid: £' . $currentBid . '</p>';
-
-            echo '<a href="auction_details.php?auction_name=' . $auction['auction_name'] . '" class="more auctionLink">More &gt;&gt;</a>';
-            echo '</article>';
-            echo '</li>';
-        }
-
-            // Function to fetch category name based on categoryID
-            function getCategoryName($categoryID, $pdo) {
-                $query = "SELECT categoryName FROM categories WHERE categoryName = :categoryID";
-                $stmt = $pdo->prepare($query);
-                $stmt->bindParam(':categoryID', $categoryID, PDO::PARAM_STR);
-                $stmt->execute();
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                return $result['categoryName'];
-            }
-            
-
-            // Function to fetch the current bid amount for an auction
-            function getCurrentBidAmount($auctionName, $pdo) {
-                $query = "SELECT MAX(bidAmount) AS currentBid FROM bids WHERE auction_name = :auctionName";
-                $stmt = $pdo->prepare($query);
-                $stmt->bindParam(':auctionName', $auctionName, PDO::PARAM_STR);
-                $stmt->execute();
-                $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                if ($result['currentBid']) {
-                    return $result['currentBid'];
-                } else {
-                    return 'No bids yet';
-                }
-            }
-            ?>
-        </ul>
-        <hr />
-		
-        <hr />
-					<h1>Sample Form</h1>
-
-					<form action="#">
-						<label>Text box</label> <input type="text" />
-						<label>Another Text box</label> <input type="text" />
-						<input type="checkbox" /> <label>Checkbox</label>
-						<input type="radio" /> <label>Radio</label>
-						<input type="submit" value="Submit" />
-
-					</form>
-
-        <footer>
-            &copy; ibuy <?php echo date("Y"); ?> <!-- Display the current year dynamically -->
-        </footer>
-		</main>
-	</body>
+<!-- Footer section -->
+<footer>
+    &copy; ibuy <?php echo date("Y"); ?> <!-- Display the current year dynamically -->
+</footer>
+</body>
 </html>

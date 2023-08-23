@@ -1,8 +1,11 @@
 <?php
 // viewauction.php
+
+// Include the database configuration file to establish a connection
 require('../dataconnection/configuration.php');
 
 if (isset($_GET['name'])) {
+    // Get the auction name from the query parameter
     $auctionName = $_GET['name'];
 
     // Fetch auction details from the database
@@ -16,12 +19,12 @@ if (isset($_GET['name'])) {
     $bidders = $bidStmt->fetchAll(PDO::FETCH_ASSOC);
 
     if ($auction) {
+        // Start of HTML content
         echo '
         <!DOCTYPE html>
         <head>
-            <title>View Auction</title>
+            <title>View Bidder</title>
             <link rel="stylesheet" href="/ibuy.css" />
-            <link rel="stylesheet" href="/styles.css" />
             <style>
             <style>
             /* Add your additional CSS styles here if needed */
@@ -119,7 +122,7 @@ if (isset($_GET['name'])) {
             display: inline-block;
             padding: 8px 25px; /* Adjust padding for the buttons */
             margin-right: 10px; /* Add margin between buttons */
-            background-color: #4CAF50;
+            background-color: #005d96;
             color: #fff;
             text-decoration: none;
             border-radius: 4px;
@@ -131,13 +134,13 @@ if (isset($_GET['name'])) {
             
             /* Hover effect for buttons */
             .button:hover {
-                background-color: #45a049;
+                background-color: #5aa0c2;
             }
             /* Button style */
 .button {
     display: inline-block;
     padding: 8px 15px; /* Adjust padding for the buttons */
-    background-color: #4CAF50;
+    background-color: #005d96;
     color: #fff;
     text-decoration: none;
     border-radius: 4px;
@@ -146,15 +149,34 @@ if (isset($_GET['name'])) {
 
 /* Hover effect for buttons */
 .button:hover {
-    background-color: #45a049;
+    background-color: #5aa0c2;
 }
-a, a:visited {
-  color: white;
+main {min-height: 50vh; background-color: #fff; width: 70vw; display: block; margin: auto; box-shadow: 0px 0px 10px #888; color:#444;}
+
+main h2 {font-size:2em;}
+
+footer {background-color: #fff; padding: 10px; color: #000;}
+
+.left ul {list-style-type: none }
+section a {color: #444;}
+
+p, li, h2 {
+  margin-bottom: 1em;
+  margin-left: 14px;
 }
+
+.stock, .sidebar {display: table;}
+.stock > ul, .sidebar .left { width: 10vw; list-style-type: none; display: table-cell; padding: 10px; background-color: #555; margin: 0;}
+.stock .products, .sidebar .right {display: table-cell; padding: 20px;}
+.stock > ul a, .sidebar .left a {color: white; text-decoration: none;}
+a:hover {color: lightgray !important;}
+.right {padding: 20px;}
+main h1 {color: #666;}
 
             </style>
         </head>
         <body>
+        <!-- Header with search form -->
         <header>
         <h1><span class="i">i</span><span class="b">b</span><span class="u">u</span><span class="y">y</span></h1>
         <form action="#">
@@ -162,22 +184,28 @@ a, a:visited {
             <input type="submit" name="submit" value="Search" />
         </form>
     </header>
+    <!-- Navigation menu -->
     <nav>
         <ul>
-            <li><a href="admin_panel.php">Home</a></li>
-            <li><a href="/">Auctions</a></li>
+            <li><a href="admin_panel.php">Admin Dashboard</a></li>
             <li><a href="categories.php">Categories</a></li>
+            <li><a href="Auctions.php">Auctions</a></li>
         </ul>
     </nav>
-
+    <!-- Banner image -->
+    <img src="/banners/2.jpg" alt="Banner" />
+    <!-- Main content with sidebar -->
     <main class="sidebar">
     <section class="left">
+    <!-- Sidebar navigation links -->
         <ul>
+        <!-- ... (Sidebar links) ... -->
         <li><a href="Auctions.php">Auctions</a></li>
         <li><a href="categories.php">Categories</a></li>
         </ul>
     </section>
     <section class="right">
+    <!-- Auction details and bidders table -->
         <h1>View Bidders - ' . $auctionName . '</h1>
         <p>Auctioneer: ' . $auction['auctioneer'] . '</p>
         <table>
@@ -185,6 +213,7 @@ a, a:visited {
                 <th style="text-align: center;">Bid Amount</th>
                 <th style="text-align: center;">Bidder Email</th>
             </tr>';
+            // Iterate through each bidder and display their information
 foreach ($bidders as $bidder) {
 echo '<tr>
             <td style="text-align: center;">' . $bidder['bidAmount'] . '</td>
@@ -198,9 +227,7 @@ echo '</table>
         </div>
     </section>
 </main>
-<footer>
-&copy; ibuy <?php echo date("Y"); ?> <!-- Display the current year dynamically -->
-</footer>
+<!-- Footer with dynamic year display -->
 </body>
 </html>';
 } else {
@@ -210,3 +237,6 @@ echo 'Auction not found';
 echo 'Invalid request';
 }
 ?>
+<footer>
+&copy; ibuy <?php echo date("Y"); ?> <!-- Display the current year dynamically -->
+</footer>

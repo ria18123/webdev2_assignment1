@@ -1,9 +1,9 @@
 <?php
-// Include the database connection code from configuration.php
-require('dataconnection/configuration.php');
-
 // Start a session at the beginning of the file
 session_start();
+
+// Include the database connection code from configuration.php
+require('dataconnection/configuration.php');
 
 // Initialize variables to store user input
 $email = $password = '';
@@ -32,8 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $loginError = "Invalid email or password.";
     }
 }
-?>
 
+// Check if the user has chosen to continue as a guest
+if (isset($_GET['continue_as_guest'])) {
+    // Redirect to the index.php page
+    header('Location: index.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -152,26 +158,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <header>
+    <!-- Website logo -->
     <h1><span class="i">i</span><span class="b">b</span><span class="u">u</span><span class="y">y</span></h1>
 </header>
 
+<!-- Banner image -->
 <img src="banners/1.jpg" alt="Banner" />
 
 <?php if (isset($loginError)) { ?>
+    <!-- Display login error message if exists -->
     <p class="error"><?php echo $loginError; ?></p>
 <?php } ?>
+
+<!-- User login form -->
 <form method="POST">
-<h2>User Login</h2>
+    <h2>User Login</h2>
     <label for="email">Email:</label>
     <input type="email" name="email" required><br>
 
     <label for="password">Password:</label>
     <input type="password" name="password" required><br>
 
+    <!-- Submit button to log in -->
     <button type="submit">LOG IN</button>
 </form>
+
+<!-- Link to registration page -->
 <p class="text-center">Don't have an account? <a href="register.php" class="highlighted-link">Register</a></p>
-<p class="text-center">Or, <a href="index.php">Continue as Guest</a></p>
+
+<!-- Footer section -->
 <footer>
     &copy; ibuy <?php echo date("Y"); ?> <!-- Display the current year dynamically -->
 </footer>

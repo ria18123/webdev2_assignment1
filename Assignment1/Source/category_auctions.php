@@ -1,32 +1,42 @@
 <?php
 // Start a session at the beginning of the file
-session_start(); // Start the session
+session_start();
+
+// Check if the user is not logged in
+if (!isset($_SESSION['user'])) {
+    // Redirect users to the login page
+    header('Location: login.php');
+    exit();
+}
 
 require('dataconnection/configuration.php'); // Connecting to the database
 
-// Check if the user is logged in
-if (!isset($_SESSION['user'])) {
-    // Redirect to login page if user is not logged in
-    header('Location: login.php'); // Change this to your login page
-    exit();
-}
+// Retrieve the category name from the URL parameter
+$categoryName = $_GET['category'];
+
+// Fetch auctions of the selected category
+$sql = "SELECT * FROM auctions WHERE categoryName = :categoryName ORDER BY auctionDate DESC";
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':categoryName', $categoryName, PDO::PARAM_STR);
+$stmt->execute();
+$auctions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-<!-- post_auction.php -->
+
 <!DOCTYPE html>
 <html>
 	<head>
-        <!-- The title of the page and link of the css -->
-		<title>post auction-ibuy Auctions</title>
+		<title>ibuy Auctions</title>
 		<link rel="stylesheet" href="ibuy.css" />
 	</head>
     <style>
     /* Basic styles for dropdown menu */
+    /* Styles for the dropdown container */
     .dropdown {
         position: relative;
         display: inline-block;
     }
 
-    /* Styling for the dropdown content */
+    /* Styles for the dropdown content */
     .dropdown-content {
         display: none;
         position: absolute;
@@ -41,7 +51,7 @@ if (!isset($_SESSION['user'])) {
         display: block;
     }
 
-    /* Styling for submit button in the header form */
+    /* Styles for submit button in header form */
     header form input[type=submit] {
         background-color: #005d96;
         color: white;
@@ -52,7 +62,7 @@ if (!isset($_SESSION['user'])) {
         border: 0;
     }
 
-    /* Styling for text input in the header form */
+    /* Styles for text input in header form */
     header form input[type="text"] {
         border: 2px solid black;
         font-size: 2em;
@@ -64,56 +74,9 @@ if (!isset($_SESSION['user'])) {
     .dropdown-content li {
         padding: 8px;
     }
-
-    /* Styling for the auction submission form */
-    .auction-form {
-        width: 60%;
-        margin: auto;
-        padding: 20px;
-        background-color: #f5f5f5;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-
-    /* Styling for labels in the auction submission form */
-    .auction-form label {
-        display: block;
-        font-size: 1.2em;
-        margin-top: 10px;
-    }
-
-    /* Styling for various input elements in the auction submission form */
-    .auction-form input[type="text"],
-    .auction-form input[type="date"],
-    .auction-form select,
-    .auction-form textarea {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    /* Styling for the submit button in the auction submission form */
-    .auction-form button[type="submit"] {
-        background-color: #3665f3;
-        color: white;
-        font-size: 1.2em;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        float: right;
-    }
-
-    /* Styling for datetime-local input in the auction submission form */
-    .auction-form input[type="datetime-local"] {
-        height: 35px;
-    }
 </style>
 
 	<body>
-        <!-- Header section with logo --> 
 		<header>
 			<h1><span class="i">i</span><span class="b">b</span><span class="u">u</span><span class="y">y</span></h1>
 
@@ -160,49 +123,67 @@ if (!isset($_SESSION['user'])) {
             <li><a class="categoryLink" href="logout.php">Logout</a></li>
         </ul>
     </nav>
-    <!-- link to the banner image -->
+<!-- Banner image -->
     <img src="banners/1.jpg" alt="Banner" />
-    <main>
-        <h2>Post Auction</h2>
-        <form method="POST" action="process_post_auction.php" class="auction-form">
-        <label for="auction_name">Auction Name:</label>
-        <input type="text" name="auction_name" required>
+   
+<!-- Main content section -->
+<main>
+    <!-- Heading with the dynamically set category name -->
+    <h1><?php echo $categoryName; ?> Auctions</h1>
 
-        <label for="auctioneer">Auctioneer:</label>
-        <!-- Display the logged-in user's name (auctioneer) -->
-        <input type="text" name="auctioneer" value="<?php echo $_SESSION['user']['FirstName'] . ' ' . $_SESSION['user']['LastName']; ?>" required readonly>
+    <!-- List of product/auction items -->
+    <ul class="productList">
+        <?php
+        // Loop through each auction and display its details
+        foreach ($auctions as $auction) {
+            echo '<li>';
+            // Display product image
+            echo '<img src="product.png" alt="' . $auction['auction_name'] . '">';
+            echo '<article>';
+            // Display auction name and associated category
+            echo '<h2>' . $auction['auction_name'] . '</h2>';
+            echo '<h3>' . getCategoryName($auction['categoryName'], $pdo) . '</h3>';
 
-        <label for="auctionDate">Auction Date:</label>
-        <input type="date" name="auctionDate" required>
-
-        <label for="auction_end_time">Auction End Time:</label>
-        <input type="datetime-local" name="auction_end_time" required>
-
-        <label for="categoryName">Category:</label>
-        <select name="categoryName" required>
-            <?php
-            // Fetch categories from the database and populate the dropdown
-            $sql = "SELECT * FROM categories";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute();
-            $categories = $stmt->fetchAll();
-
-            foreach ($categories as $category) {
-                echo "<option value='{$category['categoryName']}'>{$category['categoryName']}</option>";
+            // Shorten the description if it's too long
+            $description = $auction['Description'];
+            $maxDescriptionLength = 60; // Set desired maximum description length
+            if (strlen($description) > $maxDescriptionLength) {
+                $shortenedDescription = substr($description, 0, $maxDescriptionLength) . '...';
+                echo '<p>' . $shortenedDescription . '</p>';
+            } else {
+                echo '<p>' . $description . '</p>';
             }
-            ?>
-        </select>
 
-        <!-- description of the auction -->
-        <label for="Description">Description:</label>
-        <textarea name="Description" rows="4" cols="50" required></textarea>
-<!-- submit button -->
-        <button type="submit">Post Auction</button>
-    </form>
-    <!-- footer section -->
+            // Use the getCurrentBidAmount function to display the current bid
+            $currentBid = getCurrentBidAmount($auction['auction_name'], $pdo);
+            echo '<p class="price">Current bid: £' . $currentBid . '</p>';
+
+            // Link to view more details about the auction
+            echo '<a href="auction_details.php?auction_name=' . $auction['auction_name'] . '" class="more auctionLink">More &gt;&gt;</a>';
+            echo '</article>';
+            echo '</li>';
+        }
+
+        // Function to fetch category name based on categoryID
+        function getCategoryName($categoryID, $pdo) {
+            // SQL query to retrieve category name
+            // Prepare and execute the statement
+            // Return the category name
+        }
+
+        // Function to fetch the current bid amount for an auction
+        function getCurrentBidAmount($auctionName, $pdo) {
+            // SQL query to retrieve current bid amount
+            // Prepare and execute the statement
+            // Return the current bid amount or "No bids yet"
+        }
+        ?>
+    </ul>
+
+    <!-- Footer section -->
     <footer>
         &copy; ibuy <?php echo date("Y"); ?> <!-- Display the current year dynamically -->
     </footer>
-    </main>
+</main>
 </body>
 </html>

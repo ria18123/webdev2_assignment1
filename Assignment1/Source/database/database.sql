@@ -53,41 +53,44 @@ CREATE TABLE `auctions` (
   `auction_name` VARCHAR(90) NOT NULL PRIMARY KEY,
   `auctioneer` VARCHAR(90) DEFAULT NULL,
   `auctionDate` DATE DEFAULT NULL,
-  `categoryID` VARCHAR(20) DEFAULT NULL,
+  `auction_end_time` TIMESTAMP DEFAULT NULL, -- Add the new column for auction end time
+  `categoryName` VARCHAR(20) DEFAULT NULL,
   `Description` LONGTEXT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert data into the auctions table
-INSERT INTO `auctions` (`auction_name`, `auctioneer`, `auctionDate`, `categoryID`, `Description`) VALUES
-('Art Auction', 'John', '2023-03-15', 'Art', 'Art Auction featuring a diverse collection of modern and contemporary artworks'),
-('Charity Auction', 'Emily', '2023-03-10', 'Charity', 'Charity Auction to support local community projects and initiatives'),
-('Vintage Car Auction', 'Michael', '2023-03-18', 'AutoMobiles', 'Vintage Car Auction showcasing classic cars from different eras'),
-('Antique Furniture Auction', 'Susan', '2023-03-20', 'Antiques', 'Antique Furniture Auction presenting a wide range of exquisite antique pieces'),
-('Jewelry Auction', 'Jessica', '2023-03-12', 'Jewelry', 'Jewelry Auction featuring a dazzling collection of rings, necklaces, and more'),
-('Wine Auction', 'William', '2023-03-25', 'Beverages', 'Wine Auction offering a curated selection of fine wines and vintages'),
-('Rare Book Auction', 'Alex', '2023-03-16', 'Books', 'Rare Book Auction with a focus on unique and collectible literary works'),
-('Sports Memorabilia Auction', 'Ryan', '2023-03-14', 'Sports', 'Sports Memorabilia Auction featuring autographed jerseys, equipment, and more'),
-('Tech Gadgets Auction', 'Sophia', '2023-03-22', 'Technology', 'Tech Gadgets Auction showcasing the latest electronic devices and gadgets'),
-('Fashion Auction', 'Olivia', '2023-03-11', 'Fashion', 'Fashion Auction highlighting designer clothing, accessories, and runway pieces'),
-('Coin and Currency Auction', 'Daniel', '2023-03-17', 'Collectibles', 'Coin and Currency Auction featuring rare coins, banknotes, and numismatic items');
+INSERT INTO `auctions` (`auction_name`, `auctioneer`, `auctionDate`, `auction_end_time`, `categoryName`, `Description`) VALUES
+('Art Auction', 'John', '2023-03-15', '2023-03-15 17:59:00', 'Art', 'Art Auction featuring a diverse collection of modern and contemporary artworks'),
+('Charity Auction', 'Emily', '2023-03-10', '2023-03-10 17:59:00', 'Charity', 'Charity Auction to support local community projects and initiatives'),
+('Vintage Car Auction', 'Michael', '2023-03-18', '2023-03-18 17:59:00', 'AutoMobiles', 'Vintage Car Auction showcasing classic cars from different eras'),
+('Antique Furniture Auction', 'Susan', '2023-03-20', '2023-03-20 17:59:00', 'Antiques', 'Antique Furniture Auction presenting a wide range of exquisite antique pieces'),
+('Jewelry Auction', 'Jessica', '2023-03-12', '2023-03-12 17:59:00', 'Jewelry', 'Jewelry Auction featuring a dazzling collection of rings, necklaces, and more'),
+('Wine Auction', 'William', '2023-03-25', '2023-03-25 17:59:00', 'Beverages', 'Wine Auction offering a curated selection of fine wines and vintages'),
+('Rare Book Auction', 'Alex', '2023-03-16', '2023-03-16 17:59:00', 'Books', 'Rare Book Auction with a focus on unique and collectible literary works'),
+('Sports Memorabilia Auction', 'Ryan', '2023-03-14', '2023-03-14 17:59:00', 'Sports', 'Sports Memorabilia Auction featuring autographed jerseys, equipment, and more'),
+('Tech Gadgets Auction', 'Sophia', '2023-03-22', '2023-03-22 17:59:00', 'Technology', 'Tech Gadgets Auction showcasing the latest electronic devices and gadgets'),
+('Fashion Auction', 'Olivia', '2023-03-11', '2023-03-11 17:59:00', 'Fashion', 'Fashion Auction highlighting designer clothing, accessories, and runway pieces'),
+('Coin and Currency Auction', 'Daniel', '2023-03-17', '2023-03-17 17:59:00', 'Collectibles', 'Coin and Currency Auction featuring rare coins, banknotes, and numismatic items');
 
--- Update data in the auctions table with correct category IDs
-UPDATE `auctions` SET `categoryID` = 'Art' WHERE `auction_name` = 'Art Auction';
-UPDATE `auctions` SET `categoryID` = 'Charity' WHERE `auction_name` = 'Charity Auction';
-UPDATE `auctions` SET `categoryID` = 'AutoMobiles' WHERE `auction_name` = 'Vintage Car Auction';
-UPDATE `auctions` SET `categoryID` = 'Antiques' WHERE `auction_name` = 'Antique Furniture Auction';
-UPDATE `auctions` SET `categoryID` = 'Jewelry' WHERE `auction_name` = 'Jewelry Auction';
-UPDATE `auctions` SET `categoryID` = 'Beverages' WHERE `auction_name` = 'Wine Auction';
-UPDATE `auctions` SET `categoryID` = 'Books' WHERE `auction_name` = 'Rare Book Auction';
-UPDATE `auctions` SET `categoryID` = 'Sports' WHERE `auction_name` = 'Sports Memorabilia Auction';
-UPDATE `auctions` SET `categoryID` = 'Technology' WHERE `auction_name` = 'Tech Gadgets Auction';
-UPDATE `auctions` SET `categoryID` = 'Fashion' WHERE `auction_name` = 'Fashion Auction';
-UPDATE `auctions` SET `categoryID` = 'Collectibles' WHERE `auction_name` = 'Collectibles';
--- ... (other auction updates)
+
+-- Update data in the auctions table with correct category IDs and end times
+UPDATE `auctions` SET `categoryName` = 'Art', `auction_end_time` = '2023-03-15 17:59:00' WHERE `auction_name` = 'Art Auction';
+UPDATE `auctions` SET `categoryName` = 'Charity', `auction_end_time` = '2023-03-10 17:59:00' WHERE `auction_name` = 'Charity Auction';
+UPDATE `auctions` SET `categoryName` = 'AutoMobiles', `auction_end_time` = '2023-03-18 17:59:00' WHERE `auction_name` = 'Vintage Car Auction';
+UPDATE `auctions` SET `categoryName` = 'Antiques', `auction_end_time` = '2023-03-20 17:59:00' WHERE `auction_name` = 'Antique Furniture Auction';
+UPDATE `auctions` SET `categoryName` = 'Jewelry', `auction_end_time` = '2023-03-12 17:59:00' WHERE `auction_name` = 'Jewelry Auction';
+UPDATE `auctions` SET `categoryName` = 'Beverages', `auction_end_time` = '2023-03-25 17:59:00' WHERE `auction_name` = 'Wine Auction';
+UPDATE `auctions` SET `categoryName` = 'Books', `auction_end_time` = '2023-03-16 17:59:00' WHERE `auction_name` = 'Rare Book Auction';
+UPDATE `auctions` SET `categoryName` = 'Sports', `auction_end_time` = '2023-03-14 17:59:00' WHERE `auction_name` = 'Sports Memorabilia Auction';
+UPDATE `auctions` SET `categoryName` = 'Technology', `auction_end_time` = '2023-03-22 17:59:00' WHERE `auction_name` = 'Tech Gadgets Auction';
+UPDATE `auctions` SET `categoryName` = 'Fashion', `auction_end_time` = '2023-03-11 17:59:00' WHERE `auction_name` = 'Fashion Auction';
+UPDATE `auctions` SET `categoryName` = 'Collectibles', `auction_end_time` = '2023-03-17 17:59:00' WHERE `auction_name` = 'Coin and Currency Auction';
+-- ... (other auction updates if needed)
+
 
 -- Add foreign key constraint
 ALTER TABLE `auctions`
-ADD CONSTRAINT `fk_auctions_category` FOREIGN KEY (`categoryID`) REFERENCES `categories` (`categoryName`);
+ADD CONSTRAINT `fk_auctions_category` FOREIGN KEY (`categoryName`) REFERENCES `categories` (`categoryName`);
 
 -- Create the reviews table
 CREATE TABLE `reviews` (

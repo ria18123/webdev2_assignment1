@@ -1,6 +1,21 @@
 <?php
-session_start(); // Start the session
-require('../dataconnection/configuration.php');// Include the database configuration file to establish a connection.
+// Start a new session or resume the existing session
+session_start();
+
+// Check if the login form was submitted
+if (isset($_POST['submit'])) {
+    // Check if the provided password matches the expected value
+    if ($_POST['password'] == 'letmein') {
+        // Set the 'loggedin' session variable to true
+        $_SESSION['loggedin'] = true;
+        // Redirect the user to the admin panel page
+        header('Location: /Admin/admin_panel.php'); // Adjust the path to match the correct location
+        exit(); // Terminate further script execution
+    } else {
+        // If the password is incorrect, set an error message
+        $loginError = "Invalid password.";
+    }
+}
 ?>
 <!-- The body content goes here -->
 <!DOCTYPE html>
@@ -8,10 +23,9 @@ require('../dataconnection/configuration.php');// Include the database configura
 <!-- Head section containing metadata and external resources -->
 <head>
         <!-- The title of the page -->
-    <title>Admin Dashboard</title>
+    <title>Admin login</title>
       <!-- Link to external stylesheets -->
     <link rel="stylesheet" href="/ibuy.css" />
-   
     <!-- Add your additional CSS styles here if needed -->
     <style>
     /* Additional CSS styles for the header form submit button */
@@ -24,7 +38,7 @@ require('../dataconnection/configuration.php');// Include the database configura
         cursor: pointer;
         border: 0;
     }
-    
+
     /* Additional CSS styles for the header form text input */
     header form input[type="text"] {
         border: 2px solid black;
@@ -32,38 +46,11 @@ require('../dataconnection/configuration.php');// Include the database configura
         padding: 0.45em;
         width: 70%;
     }
-    
-    /* Style for the sidebar */
-    .sidebar {
-        align-items: center;
-        padding: 0;
-        margin-top: 2vw;
-    }
-    
-    /* Styles for the left section of the sidebar */
-    .sidebar .left {
-        width: 20%;
-        background-color: #555;
-        padding: 10px;
-        list-style-type: none;
-    }
-    
-    /* Styles for the right section of the sidebar */
-    .sidebar .right {
-        flex: 1;
-        padding: 20px;
-        text-align: center;
-    }
-    
-    /* Styles for the footer */
-    footer {
-        margin-top: 2vw;
-    }
-    
-    /* Button style */
+
+    /* Adjust the styles for the buttons */
     .button {
         display: inline-block;
-        padding: 8px 25px; /* Adjust padding for the buttons */
+        padding: 8px 15px; /* Adjust padding for the buttons */
         margin-right: 10px; /* Add margin between buttons */
         background-color: #005d96;
         color: #fff;
@@ -74,7 +61,7 @@ require('../dataconnection/configuration.php');// Include the database configura
         text-align: center;
         line-height: 20px; /* Center text vertically */
     }
-    
+
     /* Hover effect for buttons */
     .button:hover {
         background-color: #5aa0c2;
@@ -86,14 +73,14 @@ require('../dataconnection/configuration.php');// Include the database configura
         border-collapse: collapse;
         margin-top: 20px;
     }
-    
+
     /* Styles for table header cells and table data cells */
     table th,
     table td {
         padding: 8px;
         border: 1px solid #ccc;
     }
-    
+
     /* Styles for truncating long text in a table cell */
     .description-cell {
         max-width: 300px;
@@ -101,24 +88,26 @@ require('../dataconnection/configuration.php');// Include the database configura
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    
+
     /* Styles for actions cell in a table */
     .actions-cell {
         width: 150px; /* Decrease the width of the actions column */
         white-space: nowrap;
     }
-    
+
     /* Button style for buttons in this section */
-    .button {
-        display: inline-block;
-        padding: 8px 15px; /* Adjust padding for the buttons */
-        background-color: #005d96;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 4px;
-        border: none;
-    }
-    main form input {
+    main form input[type="submit"] {
+  background-color: #005d96;
+  color: white;
+  flex-grow: 0;
+  margin-left: auto;
+  font-size: 1.2em;
+  padding: 0.2em;
+  cursor: pointer;
+  border: 0;
+}
+
+main form input {
         flex-grow: 1;
         width: 20vw;
         margin-bottom: 1em;
@@ -188,10 +177,9 @@ require('../dataconnection/configuration.php');// Include the database configura
         color: #666;
     }
 </style>
-
 </head>
 <body>
-     <!-- Header section with website logo and search form -->
+    <!-- Header section with website logo and search form -->
     <header>
         <h1><span class="i">i</span><span class="b">b</span><span class="u">u</span><span class="y">y</span></h1>
         <!-- Search form -->
@@ -204,9 +192,9 @@ require('../dataconnection/configuration.php');// Include the database configura
     <nav>
         <ul>
             <!-- List of navigation links -->
-            <li><a href="admin_panel.php">Admin Dashboard</a></li>
-            <li><a href="categories.php">Categories</a></li>
-            <li><a href="Auctions.php">Auctions</a></li>
+            <li><a href="adminlogin.php">Admin Dashboard</a></li>
+            <li><a href="adminlogin.php">Categories</a></li>
+            <li><a href="adminlogin.php">Auctions</a></li>
             <li><a href="/Logout.php">Logout</a></li>
         </ul>
     </nav>
@@ -214,20 +202,23 @@ require('../dataconnection/configuration.php');// Include the database configura
     <img src="/banners/2.jpg" alt="Banner" />
     <!-- Main content section with sidebar -->
     <main class="sidebar">
-        <!-- Left sidebar section with navigation links -->
-        <section class="left">
-            <ul>
-                <!-- Additional navigation links for this section -->
-            <li><a href="categories.php">Categories</a></li>
-            <li><a href="Auctions.php">Auctions</a></li>
-            </ul>
-        </section>
-         <!-- Right sidebar section for main content -->
-        <section class="right">
-            <h2>Admin Panel</h2>
-            <p>Welcome to the admin panel</p>
-            <!-- You can add more content here if needed -->
-        </section>
+        <?php
+        // Check if the user is logged in
+        if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] == true) {
+            // ... Your logged-in content ...
+        } else {
+            ?>
+            <!-- Display login form if not logged in -->
+            <h2>Log in</h2>
+            <?php if (isset($loginError)) { echo "<p style='color: red;'>$loginError</p>"; } ?>
+            <form action="admin_panel.php" method="post" style="padding: 40px">
+                <label>Enter Password</label>
+                <input type="password" name="password" />
+                <input type="submit" name="submit" value="Log In" />
+            </form>
+            <?php
+        }
+        ?>
     </main>
     <!-- Footer section with copyright information -->
     <footer>
@@ -235,4 +226,3 @@ require('../dataconnection/configuration.php');// Include the database configura
     </footer>
 </body>
 </html>
-

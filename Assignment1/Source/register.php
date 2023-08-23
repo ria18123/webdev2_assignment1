@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$firstName, $lastName, $dob, $email, $password]);
 
     // Redirect to the login page
-    header('Location: login.php'); // Correct the path if needed
+    header('Location: index.php'); // Correct the path if needed
     exit();
 }
 ?>
@@ -138,12 +138,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
+<!-- Header section with logo --> 
     <header>
         <h1><span class="i">i</span><span class="b">b</span><span class="u">u</span><span class="y">y</span></h1>
     </header>
+
+    <!-- Main content container for registration form -->
     <div class="container">
         <form method="POST">
             <h2>User Registration</h2>
+            <!-- Input fields for user information -->
             <label for="firstName">First Name:</label>
             <input type="text" name="firstName" required><br>
 
@@ -159,9 +163,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="password">Password:</label>
             <input type="password" name="password" required><br>
 
+            <!-- Button to submit the registration form -->
             <button type="submit">Register</button>
         </form>
     </div>
+
+    <!-- Footer section displaying the current year -->
     <footer>
         &copy; ibuy <?php echo date("Y"); ?> <!-- Display the current year dynamically -->
     </footer>

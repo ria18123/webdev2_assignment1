@@ -1,8 +1,9 @@
 <?php
 // deleteauction.php
-require('../dataconnection/configuration.php');
+require('../dataconnection/configuration.php');// Include the database configuration file to establish a connection
 
 if (isset($_GET['name'])) {
+    // Get the auction name from the query parameter
     $auctionName = $_GET['name'];
 
     // Delete bids associated with the auction
@@ -22,7 +23,7 @@ if (isset($_GET['name'])) {
     $deleteAuctionStmt->execute(['auctionName' => $auctionName]);
 
     // Redirect back to the auctions list page
-    header('Location: admin_panel.php'); // Change this to the appropriate page
+    header('Location: Auctions.php'); // Change this to the appropriate page
     exit();
 } else {
     echo 'Invalid request';
